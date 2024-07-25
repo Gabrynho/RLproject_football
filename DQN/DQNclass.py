@@ -30,6 +30,7 @@ class ReplayBuffer:
     def __init__(self, max_size):
         self.buffer = []
         self.max_size = max_size
+        self.device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
 
     def add(self, state, action, reward, next_state, done):
         self.buffer.append((state, action, reward, next_state, done))
