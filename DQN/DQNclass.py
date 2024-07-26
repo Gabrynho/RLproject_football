@@ -2,6 +2,7 @@ import torch as th
 import torch.nn as nn
 import torch.optim as optim
 import random
+import numpy as np
 
 class DeepQNetwork(nn.Module):
     def __init__(self, lr, input_dims, fc1_dims, fc2_dims, fc3_dims, n_actions=19):
@@ -41,6 +42,12 @@ class ReplayBuffer:
     def sample(self, batch_size):
         sample = random.sample(self.buffer, batch_size)
         states, actions, rewards, next_states, dones = zip(*sample)
+
+        states = np.array(states)
+        actions = np.array(actions)
+        rewards = np.array(rewards)
+        next_states = np.array(next_states)
+        dones = np.array(dones)
         return th.tensor(states).to(self.device), th.tensor(actions).to(self.device), th.tensor(rewards).to(self.device), th.tensor(next_states).to(self.device), th.tensor(dones).to(self.device)
 
 class ExplorationMethod:
@@ -81,11 +88,11 @@ class Agent:
         self.exploration = ExplorationMethod(epsilon, epsilon_decay, epsilon_min)
 
     def choose_action(self, observation):
-        if random.random() > self.exploration.get_epsilon():
-            state = th.tensor([observation]).to(self.q_eval.device)
+        if random.random() > self.exploration.get_epsilon(): # exploitation
+            state = th.tensor(np.array([observation])).to(self.q_eval.device)
             actions = self.q_eval.forward(state)
             action = th.argmax(actions).item()
-        else:
+        else: # exploration
             action = random.choice([i for i in range(self.n_actions)])
         return action
 

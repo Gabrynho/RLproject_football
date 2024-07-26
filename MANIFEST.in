@@ -15,3 +15,5 @@ prune third_party/gfootball_engine/cmake-build-*
 prune third_party/gfootball_engine/build*
 prune third_party/gfootball_engine/.vs*
 prune third_party/gfootball_engine/.idea
+
+exclude DQN
