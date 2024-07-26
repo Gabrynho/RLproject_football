@@ -1,4 +1,4 @@
-#Level 2: Forward vs Defender, outside the box
+# Level 2: Forward vs Defender & Goalkeeper, outside the box
 from . import *
 
 
@@ -16,5 +16,5 @@ def build_scenario(builder):
   builder.AddPlayer(0.5, 0.0, e_PlayerRole_CF)
 
   builder.SetTeam(Team.e_Right)
-  #builder.AddPlayer(1.0, 0.0, e_PlayerRole_GK) # Possible without GK?
+  builder.AddPlayer(-1.0, 0.0, e_PlayerRole_GK)
   builder.AddPlayer(-0.75, 0.0, e_PlayerRole_CB)
