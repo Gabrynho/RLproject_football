@@ -11,10 +11,6 @@ Useful links:
 * [Google Research Football on Cloud](https://towardsdatascience.com/reproducing-google-research-football-rl-results-ac75cf17190e)
 * [GRF Kaggle competition](https://www.kaggle.com/c/google-football) - take part in the competition playing games against others, win prizes and become the GRF Champion!
 
-
-We'd like to thank Bastiaan Konings Schuiling, who authored and open-sourced the original version of this game.
-
-
 ## Quick Start
 
 ### In colab

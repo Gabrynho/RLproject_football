@@ -9,14 +9,15 @@ class DeepQNetwork(nn.Module):
         super(DeepQNetwork, self).__init__()
 
         self.model = nn.Sequential(
-            nn.Linear(*input_dims, fc1_dims),
-            nn.ReLU(),
-            nn.Linear(fc1_dims, fc2_dims),
-            nn.ReLU(),
-            nn.Linear(fc2_dims, fc3_dims),
-            nn.ReLU(),
-            nn.Linear(fc3_dims, n_actions)
-        )
+                        nn.Linear(*input_dims, fc1_dims),
+                        nn.Tanh(),
+                        nn.Linear(fc1_dims, fc2_dims),
+                        nn.Tanh(),
+                        nn.Linear(fc2_dims, fc3_dims),
+                        nn.Tanh(),
+                        nn.Linear(fc3_dims, n_actions),
+                        nn.Softmax(dim=-1)
+                        )
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
         self.loss = nn.MSELoss()
@@ -100,26 +101,26 @@ class Agent:
         self.memory.add(state, action, reward, next_state, done)
 
     def learn(self):
-        if len(self.memory.buffer) < self.batch_size:
-            return
+        if len(self.memory.buffer) < self.batch_size: # if buffer is not full
+            return # do not learn
 
         self.q_eval.optimizer.zero_grad()
 
-        states, actions, rewards, next_states, dones = self.memory.sample(self.batch_size)
-        indices = th.arange(self.batch_size)
+        states, actions, rewards, next_states, dones = self.memory.sample(self.batch_size) # sample from buffer
+        indices = th.arange(self.batch_size) # indices for actions
 
-        q_pred = self.q_eval.forward(states)[indices, actions]
-        q_next = self.q_eval.forward(next_states).max(dim=1)[0]
+        q_pred = self.q_eval.forward(states)[indices, actions] # predicted q values
+        q_next = self.q_eval.forward(next_states).max(dim=1)[0] # max q values for next states
 
-        q_next[dones] = 0.0
+        q_next[dones] = 0.0 # if done, q value is 0
 
-        q_target = rewards + self.gamma * q_next
+        q_target = rewards + self.gamma * q_next # target q value
 
-        loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device)
-        loss.backward()
-        self.q_eval.optimizer.step()
+        loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device) # loss
+        loss.backward() # backpropagation
+        self.q_eval.optimizer.step() # update weights
 
-        self.exploration.update_steps(self.batch_size)
+        self.exploration.update_steps(self.batch_size) # update steps
 
     def save_model(self, filename):
         th.save(self.q_eval.state_dict(), filename)
