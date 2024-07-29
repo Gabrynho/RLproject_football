@@ -28,11 +28,11 @@ def convert_to_csv(scst, level):
 
 lr = .00001                 # learning rate
 gamma = 0.99                # discount factor
-batch_size = 256            # batch size
+batch_size = 128            # batch size
 
-epsilon = 0.75              # starting value of epsilon
+epsilon = 0.6              # starting value of epsilon
 epsilon_decay = 0.9995      # decay rate of epsilon
-epsilon_min = 0.1           # minimum value of epsilon
+epsilon_min = 0.01           # minimum value of epsilon
 
 max_size = 10000            # max size of the replay buffer
 
@@ -118,7 +118,7 @@ def test_agent(level, agent, num_test):
     print(f"Testing on level {level}")
     observations = []
 
-    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, write_goal_dumps=True, rewards='scoring,checkpoints')
+    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, rewards='scoring,checkpoints')
     start_time = time.time()
 
     # Test loop
@@ -139,7 +139,6 @@ def test_agent(level, agent, num_test):
             if score > 1 and done == True:
                 print("Goal!")
                 save_observations_to_csv(folder, f'level{level}_episode_{episode+1}_observations.csv', observations)
-                env.write_dump(f'level{level}_episode_{episode+1}_observations.dmp')
         print(f"Game {episode+1}: Score = {score}, Steps = {steps}")
         observations = []
     env.close()

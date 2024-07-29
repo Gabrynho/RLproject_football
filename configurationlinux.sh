@@ -4,7 +4,7 @@
 
 sudo apt-get update
 
-sudo apt-get install git cmake make build-essential libgl1-mesa-dev libsdl2-dev \
+sudo apt-get install -y git cmake make build-essential libgl1-mesa-dev libsdl2-dev \
 libsdl2-image-dev libsdl2-ttf-dev libsdl2-gfx-dev libboost-all-dev \
 libdirectfb-dev libst-dev mesa-utils xvfb x11vnc libsdl-sge-dev python3-pip
 
