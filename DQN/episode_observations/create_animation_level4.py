@@ -6,7 +6,7 @@ import matplotlib.animation as animation
 import re
 
 def load_and_process_data(filename):
-    df = pd.read_csv(filename)
+    df = pd.read_csv(f'DQN/episode_observations/{filename}')
     data = df[['88', '89', '0', '1', '2', '3', '4', '5', '6', '7', '16', '17', '18', '19', '20', '21']]*100
     data = data.iloc[:-1]
     data.columns = ['ball_x', 'ball_y', 'gk_x', 'gk_y', 'att1_x', 'att1_y', 'cr7_x', 'cr7_y', 'att2_x', 'att_y', 'gk_opp_x', 'gk_opp_y','defender1_x','defender1_y', 'defender2_x', 'defender2_y']
