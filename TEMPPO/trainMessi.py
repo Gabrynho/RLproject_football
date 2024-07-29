@@ -61,7 +61,7 @@ if os.path.exists('TEMPPO/Messi_model.pth'):
 num_episodes = 1000
 num_test = 100
 
-def train_agent(level, agent, num_episodes):
+def train_agent(level, agent, num_episodes, tesla):
 
     print("############################################")
     print(f"Training on level {level}")
