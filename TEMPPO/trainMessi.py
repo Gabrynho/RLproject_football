@@ -61,7 +61,7 @@ if os.path.exists('TEMPPO/Messi_model.pth'):
 num_episodes = 1000
 num_test = 100
 
-def train_agent(level, agent, num_episodes):
+def train_agent(level, agent, num_episodes, tesla):
 
     print("############################################")
     print(f"Training on level {level}")
@@ -157,7 +157,7 @@ def test_agent(level, agent, num_test):
 ############################################
 
 # Train
-scst1 = train_agent(1, Messi, num_episodes)
+scst1 = train_agent(1, Messi, num_episodes, tesla=tesla)
 
 convert_to_csv(scst1, 1)
 
@@ -171,7 +171,7 @@ test_agent(1, Messi, num_test)
 ############################################
 
 # Train
-scst2 = train_agent(2, Messi, num_episodes)
+scst2 = train_agent(2, Messi, num_episodes, tesla=tesla)
 
 convert_to_csv(scst2, 2)
 
@@ -185,7 +185,7 @@ test_agent(2, Messi, num_test)
 ############################################
 
 # Train
-scst3 = train_agent(3, Messi, num_episodes)
+scst3 = train_agent(3, Messi, num_episodes, tesla=tesla)
 
 convert_to_csv(scst3, 3)
 
@@ -199,7 +199,7 @@ test_agent(3, Messi, num_test)
 ############################################
 
 # Train
-scst4 = train_agent(4, Messi, num_episodes)
+scst4 = train_agent(4, Messi, num_episodes, tesla=tesla)
 
 convert_to_csv(scst4, 4)
 
