@@ -254,7 +254,7 @@ print(f"Time: {end_time - start_time} seconds")
 ############################################
 
 # Test the agent and see how it acts
-test_env5 = football_env.create_environment(env_name="gm_level5", representation='simple115', stacked=False, write_goal_dumps=True, rewards='scoring,checkpoints')
+test_env5 = football_env.create_environment(env_name="gm_level5", representation='simple115', stacked=False, rewards='scoring,checkpoints')
 print("############################################")
 print("Testing on level 5")
 start_time = time.time()
@@ -280,7 +280,6 @@ for episode in range(num_test):
             computer_goal += 1
             print("Goal for the computer!")
     print(f"Training Match {i+1} RL Agent - Computer: {rlagent_goal}-{computer_goal}")
-    test_env5.write_dump(f'level5_episode_{episode+1}_observations.dmp')
     diff_goal.append(rlagent_goal-computer_goal)
 test_env5.close()
 df2 = pd.DataFrame(diff_goal, columns=['Difference Goal'])
