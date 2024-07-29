@@ -1,12 +1,12 @@
-import torch
+import torch as th
 import torch.nn as nn
 from torch.distributions import Categorical
 
-device = torch.device('cpu')
+device = th.device('cpu')
 
-if(torch.cuda.is_available()): 
-    device = torch.device('cuda:0') 
-    torch.cuda.empty_cache()
+if(th.cuda.is_available()): 
+    device = th.device('cuda:0') 
+    th.cuda.empty_cache()
 
 class RolloutBuffer:
     def __init__(self):
@@ -41,24 +41,24 @@ class ActorCritic(nn.Module):
 
         # critic1
         self.critic1 = nn.Sequential(
-                        nn.Linear(state_dim, 128),
+                        nn.Linear(state_dim, fc1_dims),
                         nn.Tanh(),
-                        nn.Linear(128, 128),
+                        nn.Linear(fc1_dims, fc2_dims),
                         nn.Tanh(),
-                        nn.Linear(128, 128),
+                        nn.Linear(fc2_dims, fc3_dims),
                         nn.Tanh(),
-                        nn.Linear(128, 1)
+                        nn.Linear(fc3_dims, 1)
                     )
         
         # critic2
         self.critic2 = nn.Sequential(
-                        nn.Linear(state_dim, 128),
+                        nn.Linear(state_dim, fc1_dims),
                         nn.Tanh(),
-                        nn.Linear(128, 128),
+                        nn.Linear(fc1_dims, fc2_dims),
                         nn.Tanh(),
-                        nn.Linear(128, 128),
+                        nn.Linear(fc2_dims, fc3_dims),
                         nn.Tanh(),
-                        nn.Linear(128, 1)
+                        nn.Linear(fc3_dims, 1)
                     )
 
     def forward(self):
@@ -83,7 +83,7 @@ class ActorCritic(nn.Module):
         dist_entropy = dist.entropy()
         state_values1 = self.critic1(state) ### my change
         state_values2 = self.critic2(state)
-        state_values = torch.min(state_values1, state_values2)
+        state_values = th.min(state_values1, state_values2)
 
         return action_logprobs, state_values, dist_entropy
     
@@ -98,11 +98,13 @@ class PPO:
         self.buffer = RolloutBuffer()
 
         self.policy = ActorCritic(state_dim, action_dim, fc1_dims, fc2_dims, fc3_dims).to(device)
-        self.optimizer = torch.optim.Adam([
+        self.optimizer = th.optim.Adam([
                         {'params': self.policy.actor.parameters(), 'lr': lr_actor},
                         {'params': self.policy.critic1.parameters(), 'lr': lr_critic},
                         {'params': self.policy.critic2.parameters(), 'lr': lr_critic}
                     ])
+        
+        self.device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
 
         self.policy_old = ActorCritic(state_dim, action_dim).to(device)
         self.policy_old.load_state_dict(self.policy.state_dict())
@@ -111,8 +113,8 @@ class PPO:
 
     def select_action(self, state):
 
-        with torch.no_grad():
-            state = torch.FloatTensor(state).to(device)
+        with th.no_grad():
+            state = th.FloatTensor(state).to(device)
             action, action_logprob = self.policy_old.act(state)
         
         self.buffer.states.append(state)
@@ -134,13 +136,13 @@ class PPO:
             rewards.insert(0, discounted_reward)
             
         # Normalizing the rewards
-        rewards = torch.tensor(rewards, dtype=torch.float32).to(device)
+        rewards = th.tensor(rewards, dtype=th.float32).to(device)
         rewards = (rewards - rewards.mean()) / (rewards.std() + 1e-7)
 
         # convert list to tensor
-        old_states = torch.squeeze(torch.stack(self.buffer.states, dim=0)).detach().to(device)
-        old_actions = torch.squeeze(torch.stack(self.buffer.actions, dim=0)).detach().to(device)
-        old_logprobs = torch.squeeze(torch.stack(self.buffer.logprobs, dim=0)).detach().to(device)
+        old_states = th.squeeze(th.stack(self.buffer.states, dim=0)).detach().to(device)
+        old_actions = th.squeeze(th.stack(self.buffer.actions, dim=0)).detach().to(device)
+        old_logprobs = th.squeeze(th.stack(self.buffer.logprobs, dim=0)).detach().to(device)
 
         
         # Optimize policy for K epochs
@@ -150,26 +152,26 @@ class PPO:
             logprobs, state_values, dist_entropy = self.policy.evaluate(old_states, old_actions)
 
             # match state_values tensor dimensions with rewards tensor
-            state_values = torch.squeeze(state_values)
+            state_values = th.squeeze(state_values)
             
             # Finding the ratio (pi_theta / pi_theta__old)
-            ratios = torch.exp(logprobs - old_logprobs.detach())
+            ratios = th.exp(logprobs - old_logprobs.detach())
 
             # Finding Surrogate Loss
             advantages1 = rewards - state_values.detach() 
             advantages2 = rewards - state_values.detach() - 0.01*dist_entropy 
 
             surr1 = ratios * advantages1
-            surr2 = torch.clamp(ratios, 1-self.eps_clip, 1+self.eps_clip) * advantages1
+            surr2 = th.clamp(ratios, 1-self.eps_clip, 1+self.eps_clip) * advantages1
 
             # final loss of clipped objective PPO
-            loss1 = -torch.min(surr1, surr2) + 0.5*self.MseLoss(state_values, rewards) - 0.01*dist_entropy
+            loss1 = -th.min(surr1, surr2) + 0.5*self.MseLoss(state_values, rewards) - 0.01*dist_entropy
             
             surr1 = ratios * advantages2
-            surr2 = torch.clamp(ratios, 1-self.eps_clip, 1+self.eps_clip) * advantages2
+            surr2 = th.clamp(ratios, 1-self.eps_clip, 1+self.eps_clip) * advantages2
 
             # final loss of clipped objective PPO
-            loss2 = -torch.min(surr1, surr2) + 0.5*self.MseLoss(state_values, rewards)
+            loss2 = -th.min(surr1, surr2) + 0.5*self.MseLoss(state_values, rewards)
             
             loss = tesla * loss2 + (1 - tesla) * loss1
             # print("this is loss", loss)
@@ -185,10 +187,10 @@ class PPO:
         self.buffer.clear()
     
     
-    def save(self, checkpoint_path):
-        torch.save(self.policy_old.state_dict(), checkpoint_path)
+    def save_model(self, filename):
+        th.save(self.policy_old.state_dict(), filename)
    
 
-    def load(self, checkpoint_path):
-        self.policy_old.load_state_dict(torch.load(checkpoint_path, map_location=lambda storage, loc: storage))
-        self.policy.load_state_dict(torch.load(checkpoint_path, map_location=lambda storage, loc: storage))
+    def load_model(self, filename):
+        self.policy_old.load_state_dict(th.load(filename))
+        self.policy.load_state_dict(th.load(filename))

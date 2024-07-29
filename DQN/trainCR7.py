@@ -23,6 +23,24 @@ def convert_to_csv(scst, level):
     df1.to_csv(f'DQN/level{level}_score_per_step.csv', index=False)
 
 ############################################
+# Hyperparameters
+############################################
+
+lr = .00001                 # learning rate
+gamma = 0.99                # discount factor
+batch_size = 256            # batch size
+
+epsilon = 0.75              # starting value of epsilon
+epsilon_decay = 0.9995      # decay rate of epsilon
+epsilon_min = 0.1           # minimum value of epsilon
+
+max_size = 10000            # max size of the replay buffer
+
+fc1_dims=128                # number of neurons in the first layer
+fc2_dims=128                # number of neurons in the second layer      
+fc3_dims=128                # number of neurons in the third layer
+
+############################################
 # Inizialization
 ############################################
 
@@ -33,10 +51,10 @@ env = football_env.create_environment(env_name="gm_level1", representation='simp
 
 # Initialize the DQN agent
 CR7 = DQN.Agent(input_dims=env.observation_space.shape, n_actions=env.action_space.n,
-                  lr=.00001, gamma=0.99, batch_size=256,
-                  epsilon=0.5, epsilon_decay=0.9995, epsilon_min=0.01,
-                  max_size=50000, 
-                  fc1_dims=128, fc2_dims=128, fc3_dims=128)
+                  lr=lr, gamma=gamma, batch_size=batch_size,
+                  epsilon=epsilon, epsilon_decay=epsilon_decay, epsilon_min=epsilon_min,
+                  max_size=max_size, 
+                  fc1_dims=fc1_dims, fc2_dims=fc2_dims, fc3_dims=fc3_dims)
 
 # Load the template if it exists
 if os.path.exists('DQN/CR7_model.pth'):
@@ -45,8 +63,8 @@ if os.path.exists('DQN/CR7_model.pth'):
     CR7.q_eval.to(CR7.q_eval.device)
 
 # Number of episodes
-num_episodes = 10000
-num_test = 1000
+num_episodes = 1000
+num_test = 100
 
 def train_agent(level, agent, num_episodes):
 
@@ -67,7 +85,11 @@ def train_agent(level, agent, num_episodes):
             action = agent.choose_action(observation)
             next_observation, reward, done, info = env.step(action)
             score += reward
+
+            # Store the transition
             agent.store_transition(observation, action, reward, next_observation, done)
+
+            # Learn
             agent.learn()
             observation = next_observation
             steps += 1
@@ -93,7 +115,7 @@ def test_agent(level, agent, num_test):
     print(f"Testing on level {level}")
     observations = []
 
-    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
+    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, write_goal_dumps=True, rewards='scoring,checkpoints')
     start_time = time.time()
 
     # Test loop
@@ -113,11 +135,12 @@ def test_agent(level, agent, num_test):
             steps += 1
             if score > 1 and done == True:
                 print("Goal!")
-                save_observations_to_csv(folder, f'level1_episode_{episode+1}_observations.csv')
+                save_observations_to_csv(folder, f'level{level}_episode_{episode+1}_observations.csv', observations)
+                env.write_dump(f'level{level}_episode_{episode+1}_observations.dmp')
         print(f"Game {episode+1}: Score = {score}, Steps = {steps}")
         observations = []
-    
     env.close()
+
     end_time = time.time()
     print(f"Testing on level {level} completed")
     print(f"Time: {end_time - start_time} seconds")
@@ -183,13 +206,15 @@ test_agent(4, CR7, num_test)
 ############################################
 
 # Number of episodes
-num_match = 1000
-num_test = 100
+num_match = 100
+num_test = 10 # DO NOT CHANGE THIS VALUE (10)
 
 # Initialize the environment
 level5_env = football_env.create_environment(env_name="gm_level5", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
+print("############################################")
 print("Training on level 5")
 start_time = time.time()
+diff_goal = []
 
 # Training loops
 for i in range(num_match): # number of episodes
@@ -207,28 +232,30 @@ for i in range(num_match): # number of episodes
         CR7.learn()
         observation = next_observation
         steps += 1
-        if reward >= 0.995:
+        if reward > 0.995:
             rlagent_goal += 1  
             print("Goal!")
         if reward < -0.995:
             computer_goal += 1
             print("Goal for the computer!")
     print(f"Training Match {i} RL Agent - Computer: {rlagent_goal}-{computer_goal}")
-    if i % 10 == 0:
+    diff_goal.append(rlagent_goal - computer_goal)
+    if i % 5 == 0:
         CR7.save_model('DQN/CR7_model.pth')
 level5_env.close()
 CR7.save_model('DQN/CR7_model.pth')
 end_time = time.time()
 print("Training on level 5 completed")
 print(f"Time: {end_time - start_time} seconds")
-print("############################################")
 
 ############################################
 
 # Test the agent and see how it acts
-test_env5 = football_env.create_environment(env_name="gm_level5", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
+test_env5 = football_env.create_environment(env_name="gm_level5", representation='simple115', stacked=False, write_goal_dumps=True, rewards='scoring,checkpoints')
+print("############################################")
 print("Testing on level 5")
 start_time = time.time()
+diff_goal = []
 
 # Test loops
 for episode in range(num_test):
@@ -236,18 +263,13 @@ for episode in range(num_test):
     observation = test_env5.reset()
     done = False
     score = 0
-    steps = 0
     rlagent_goal = 0
     computer_goal = 0
-    score_list = []
-    diff_goal = []
     while not done:
         action = CR7.choose_action(observation)
         observation, reward, done, info = test_env5.step(action)
         # Update the score
         score += reward
-        score_list.append(score)
-        steps += 1
         if reward > 0.995:
             rlagent_goal += 1  
             print("Goal!")
@@ -255,8 +277,7 @@ for episode in range(num_test):
             computer_goal += 1
             print("Goal for the computer!")
     print(f"Training Match {i+1} RL Agent - Computer: {rlagent_goal}-{computer_goal}")
-    df1 = pd.DataFrame(score_list, columns=['Score'])
-    df1.to_csv(f'DQN/level5_score_matchtest{episode+1}.csv', index=False)
+    test_env5.write_dump(f'level5_episode_{episode+1}_observations.dmp')
     diff_goal.append(rlagent_goal-computer_goal)
 test_env5.close()
 df2 = pd.DataFrame(diff_goal, columns=['Difference Goal'])
@@ -264,4 +285,8 @@ df2.to_csv(f'DQN/level5_test_diff_goal.csv', index=False)
 print("Testing on level 5 completed")
 end_time = time.time()
 print(f"Time: {end_time - start_time} seconds")
+print("############################################")
+
+print("Training completed!!!")
+
 print("############################################")
