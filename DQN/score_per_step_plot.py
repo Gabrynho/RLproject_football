@@ -30,7 +30,7 @@ for i, d in enumerate(data):
     min_chi2 = float('inf')
 
     # Test del chi-quadro per selezionare il miglior grado del polinomio
-    for degree in range(2, 15):
+    for degree in range(2, 11):
         coeffs = np.polyfit(x, y, degree)
         poly_eq = np.poly1d(coeffs)
         fitted_values = poly_eq(x)
@@ -48,3 +48,6 @@ for i, d in enumerate(data):
 
 plt.tight_layout()
 plt.show()
+
+# Save the plot
+plt.savefig('DQN/score_per_step_plot.png')
