@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as plt
 from mplsoccer import Pitch
 import matplotlib.animation as animation
+import re
 
 def load_and_process_data(filename):
     df = pd.read_csv(filename)
@@ -32,7 +33,7 @@ def create_animation(data, filename):
     pitch = Pitch(pitch_type='custom',
                   pitch_color='grass', line_color='white',
                   stripe=True,
-                  pitch_length=150, pitch_width=84,
+                  pitch_length=200, pitch_width=84,
                   axis=True, label=True, half=True) 
 
     fig, ax = pitch.draw()
@@ -70,18 +71,10 @@ def create_animation(data, filename):
     ani = animation.FuncAnimation(fig, update, frames=len(data), interval=100)
 
     # Save the animation as a video
-    ani.save(filename, writer='ffmpeg')
+    ani.save(f'DQN/episode_observations/{filename}', writer='ffmpeg')
 
-# Get a list of all .csv files in the directory that match the specific pattern
-csv_files = [f for f in os.listdir('./DQN/episode_observations') if os.path.isfile(f) and f.startswith('level4_episode') and f.endswith('_observations.csv')]
-
-for file in csv_files:
-    # Check if the part between 'level4_episode' and '_observations.csv' is a number
-    episode_number = file[len('level4_episode'):-len('_observations.csv')]
-    if episode_number.isdigit():
-        # Load and process the data
-        data = load_and_process_data(file)
-        
-        # Create a video for each file
-        video_filename = file.replace('.csv', '.mp4')
-        create_animation(data, video_filename)
+# Get a list of all .csv files in the directory that begins with level1 and ends with .csv
+files = [f for f in os.listdir('./DQN/episode_observations') if re.match(r'level4.*\.csv', f)]
+for file in files:
+    data = load_and_process_data(file)
+    create_animation(data, file.replace('.csv', '.mp4'))
