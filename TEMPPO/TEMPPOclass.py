@@ -106,7 +106,7 @@ class PPO:
         
         self.device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
 
-        self.policy_old = ActorCritic(state_dim, action_dim).to(device)
+        self.policy_old = ActorCritic(state_dim, action_dim, fc1_dims, fc2_dims, fc3_dims).to(device)
         self.policy_old.load_state_dict(self.policy.state_dict())
         
         self.MseLoss = nn.MSELoss()

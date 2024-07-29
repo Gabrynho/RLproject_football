@@ -15,3 +15,7 @@ python3 -m pip install psutil
 
 git clone https://github.com/Gabrynho/RLproject_football.git
 cd RLproject_football && python3 -m pip install .
+
+# If any problem try to install a conda environment and install the following dependencies:
+# conda install -c conda-forge gcc=12.1.0
+# conda install libgcc==5.2.0
