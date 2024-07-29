@@ -62,10 +62,10 @@ def create_animation(data, filename):
         ball_scatter.set_offsets([data['ball_x'][frame], data['ball_y'][frame]])
         cr7_scatter.set_offsets([data['cr7_x'][frame], data['cr7_y'][frame]])
         gk_opp_scatter.set_offsets([data['gk_opp_x'][frame], data['gk_opp_y'][frame]])
-        defender1_scatter.set_offsets([data['defender_x'][frame], data['defender_y'][frame]])
-        defender2_scatter.set_offsets([data['defender_x'][frame], data['defender_y'][frame]])
-        att1_scatter.set_offsets([data['att_x'][frame], data['att_y'][frame]])
-        att2_scatter.set_offsets([data['att_x'][frame], data['att_y'][frame]])
+        defender1_scatter.set_offsets([data['defender1_x'][frame], data['defender1_y'][frame]])
+        defender2_scatter.set_offsets([data['defender2_x'][frame], data['defender2_y'][frame]])
+        att1_scatter.set_offsets([data['att1_x'][frame], data['att1_y'][frame]])
+        att2_scatter.set_offsets([data['att1_x'][frame], data['att1_y'][frame]])
 
     # Create the animation
     ani = animation.FuncAnimation(fig, update, frames=len(data), interval=100)
