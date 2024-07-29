@@ -73,7 +73,7 @@ def create_animation(data, filename):
     ani.save(filename, writer='ffmpeg')
 
 # Get a list of all .csv files in the directory that match the specific pattern
-csv_files = [f for f in os.listdir('.') if os.path.isfile(f) and f.startswith('level4_episode') and f.endswith('_observations.csv')]
+csv_files = [f for f in os.listdir('./DQN/episode_observations') if os.path.isfile(f) and f.startswith('level4_episode') and f.endswith('_observations.csv')]
 
 for file in csv_files:
     # Check if the part between 'level4_episode' and '_observations.csv' is a number
