@@ -52,6 +52,9 @@ Messi = TEMPPO.PPO(state_dim=env.observation_space.shape[0], action_dim=env.acti
                        gamma=gamma, K_epochs=K_epochs, eps_clip=eps_clip,
                        fc1_dims=fc1_dims, fc2_dims=fc2_dims, fc3_dims=fc3_dims)
 
+# Check if the agent has been initialized with cuda
+print(Messi.device)
+
 if os.path.exists('TEMPPO/Messi_model.pth'):
     Messi.load_model('TEMPPO/Messi_model.pth')
 

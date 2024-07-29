@@ -56,6 +56,9 @@ CR7 = DQN.Agent(input_dims=env.observation_space.shape, n_actions=env.action_spa
                   max_size=max_size, 
                   fc1_dims=fc1_dims, fc2_dims=fc2_dims, fc3_dims=fc3_dims)
 
+# Check if the agent has been initialized with cuda
+print(CR7.q_eval.device)
+
 # Load the template if it exists
 if os.path.exists('DQN/CR7_model.pth'):
     CR7.q_eval.load_state_dict(th.load('DQN/CR7_model.pth'))
