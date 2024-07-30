@@ -48,7 +48,7 @@ fc3_dims=128                # number of neurons in the third layer
 folder = 'DQN/episode_observations'
 
 # Create the environment of reference
-env = football_env.create_environment(env_name="gm_level1", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
+env = football_env.create_environment(env_name="gm_level1", representation='simple115', stacked=False, render=False, rewards='scoring')
 
 # Initialize the DQN agent
 CR7 = DQN.Agent(input_dims=env.observation_space.shape, n_actions=env.action_space.n,
@@ -100,7 +100,7 @@ def train_agent(level, agent, num_episodes):
             if score > 1 and done==True:
                 print("Goal!")
         scst.append(score/steps)
-        print(f'Episode {i+1}, Score: {score}, Steps: {steps}')
+        print(f'Level{level} Episode {i+1}: Score = {score}, Steps = {steps}')
         if i % 10 == 0:
             agent.save_model('DQN/CR7_model.pth')
     env.close()
@@ -140,7 +140,7 @@ def test_agent(level, agent, num_test):
             if score > 1 and done == True:
                 print("Goal!")
                 save_observations_to_csv(folder, f'level{level}_episode_{episode+1}_observations.csv', observations)
-        print(f"Game {episode+1}: Score = {score}, Steps = {steps}")
+        print(f"Level {level} Game {episode+1}: Score = {score}, Steps = {steps}")
         observations = []
     env.close()
 
