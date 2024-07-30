@@ -76,7 +76,7 @@ def train_agent(level, agent, num_episodes):
     print(f"Training on level {level}")
     scst = []
 
-    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
+    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, render=False, rewards='scoring')
 
     # Training loops
     start_time = time.time()
@@ -119,7 +119,7 @@ def test_agent(level, agent, num_test):
     print(f"Testing on level {level}")
     observations = []
 
-    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, rewards='scoring,checkpoints')
+    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, rewards='scoring')
     start_time = time.time()
 
     # Test loop
