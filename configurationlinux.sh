@@ -1,8 +1,8 @@
 # If you are using a linux distribution
 # you can use this script to install the necessary dependencies to run the project.
 # Check the gfootball/doc/compile_engine.md file for more information.
-
-git clone https://github.com/Gabrynho/RLproject_football.git
+# after you clone it:
+# git clone https://github.com/Gabrynho/RLproject_football.git
 
 sudo apt-get update
 
