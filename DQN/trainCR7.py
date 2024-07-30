@@ -105,8 +105,7 @@ def train_agent(level, agent, num_episodes):
             agent.save_model('DQN/CR7_model.pth')
     env.close()
     agent.save_model('DQN/CR7_model.pth')
-    agent.exploration.epsilon.reset()
-
+    
     end_time = time.time()
     computation_time = end_time - start_time
     print(f"Training on level {level} completed")
