@@ -4,6 +4,7 @@ import torch as th
 import pandas as pd
 import os
 import time
+import pickle
 import gfootball.env as football_env
 
 ############################################
@@ -27,7 +28,7 @@ def convert_to_csv(scst, level):
 # Hyperparameters
 ############################################
 
-lr = .0001                  # learning rate
+lr = .00001                  # learning rate
 gamma = 0.99                # discount factor
 batch_size = 256             # batch size
 
@@ -67,16 +68,23 @@ if os.path.exists('DQN/CR7_model.pth'):
     CR7.q_eval.to(CR7.q_eval.device)
 
 # Number of episodes
-num_episodes = 2000
+num_episodes = 1000
 num_test = 100
 
 def train_agent(level, agent, num_episodes):
+    # The file with checkpointing data
+    chkpt_fname = 'DQN/CR7_checkpoint.pth'
 
     print("############################################")
     print(f"Training on level {level}")
     scst = []
 
     env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
+
+    # Check if a checkpoint exists and load it
+    if os.path.exists(chkpt_fname):
+        with open(chkpt_fname, 'rb') as f:
+            agent = pickle.load(f)
 
     # Training loops
     start_time = time.time()
@@ -103,6 +111,11 @@ def train_agent(level, agent, num_episodes):
         print(f'Level {level} Episode {i+1}: Score = {score}, Steps = {steps}')
         if i % 10 == 0:
             agent.save_model('DQN/CR7_model.pth')
+
+        # Save a checkpoint after each episode
+        with open(chkpt_fname, 'wb') as f:
+            pickle.dump(agent, f)
+
     env.close()
     agent.save_model('DQN/CR7_model.pth')
 
@@ -162,6 +175,8 @@ convert_to_csv(scst0, 0)
 # Test
 
 test_agent(0, CR7, num_test)
+
+create_animations_for_level(0)
 
 ############################################
 # Level 1 Training: Forward vs Goalkeeper
