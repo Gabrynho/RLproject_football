@@ -32,7 +32,7 @@ gamma = 0.99                # discount factor
 batch_size = 64             # batch size
 
 epsilon = 1.0               # starting value of epsilon
-epsilon_decay = 0.00005     # decay rate of epsilon
+epsilon_decay = 0.0005     # decay rate of epsilon
 epsilon_min = 0.1           # minimum value of epsilon
 
 max_size = 10000            # max size of the replay buffer
@@ -67,8 +67,8 @@ if os.path.exists('DQN/CR7_model.pth'):
     CR7.q_eval.to(CR7.q_eval.device)
 
 # Number of episodes
-num_episodes = 0
-num_test = 0
+num_episodes = 10000
+num_test = 100
 
 def train_agent(level, agent, num_episodes):
 
@@ -100,12 +100,12 @@ def train_agent(level, agent, num_episodes):
             if score > 1 and done==True:
                 print("Goal!")
         scst.append(score/steps)
-        print(f'Episode {i}, Score: {score}, Steps: {steps}')
+        print(f'Episode {i+1}, Score: {score}, Steps: {steps}')
         if i % 10 == 0:
             agent.save_model('DQN/CR7_model.pth')
     env.close()
     agent.save_model('DQN/CR7_model.pth')
-    
+
     end_time = time.time()
     computation_time = end_time - start_time
     print(f"Training on level {level} completed")
@@ -217,8 +217,8 @@ create_animations_for_level(4)
 ############################################
 
 # Number of episodes
-num_match = 1000
-num_test = 50 # DO NOT CHANGE THIS VALUE (10)
+num_match = 100
+num_test = 0 
 
 # Initialize the environment
 level5_env = football_env.create_environment(env_name="gm_level5", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')

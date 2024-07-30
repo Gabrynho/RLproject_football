@@ -31,3 +31,6 @@ cmake_install.cmake
 
 # Pytorch Models
 #DQN/*.pth
+
+# TEMPPO folder and its contents
+TEMPPO/
