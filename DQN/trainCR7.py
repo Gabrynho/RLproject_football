@@ -76,7 +76,7 @@ def train_agent(level, agent, num_episodes):
     print(f"Training on level {level}")
     scst = []
 
-    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, render=False, rewards='scoring')
+    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
 
     # Training loops
     start_time = time.time()
@@ -100,7 +100,7 @@ def train_agent(level, agent, num_episodes):
             if score > 1 and done==True:
                 print("Goal!")
         scst.append(score/steps)
-        print(f'Level{level} Episode {i+1}: Score = {score}, Steps = {steps}')
+        print(f'Level {level} Episode {i+1}: Score = {score}, Steps = {steps}')
         if i % 10 == 0:
             agent.save_model('DQN/CR7_model.pth')
     env.close()
@@ -119,7 +119,7 @@ def test_agent(level, agent, num_test):
     print(f"Testing on level {level}")
     observations = []
 
-    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, rewards='scoring')
+    env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, rewards='scoring,checkpoints')
     start_time = time.time()
 
     # Test loop
