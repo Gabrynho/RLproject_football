@@ -17,14 +17,13 @@ python3 -m pip install psutil
 
 #create virtual environment with conda
 conda create --name football-env python=3.9 -y
-conda activate football-env
+source activate football-env
 
 python3 -m pip install --upgrade pip
 pip install setuptools==65.5.0
 pip install wheel==0.38.0
 python3 -m pip install psutil
 
-conda install libgcc==5.2.0 -y
 conda install -c conda-forge gcc=12.1.0 -y
 
 python3 -m pip install .
