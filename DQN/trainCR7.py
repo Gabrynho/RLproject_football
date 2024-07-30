@@ -1,5 +1,4 @@
 import DQNclass as DQN
-from episode_observations.create_animation import create_animations_for_level
 import torch as th
 import pandas as pd
 import os
@@ -176,8 +175,6 @@ convert_to_csv(scst0, 0)
 
 test_agent(0, CR7, num_test)
 
-create_animations_for_level(0)
-
 ############################################
 # Level 1 Training: Forward vs Goalkeeper
 ############################################
@@ -191,8 +188,6 @@ convert_to_csv(scst1, 1)
 
 # Test 
 test_agent(1, CR7, num_test)
-
-create_animations_for_level(1)
 
 ############################################
 # Level 2 Training: Forward vs Defender (and GK)
@@ -208,8 +203,6 @@ convert_to_csv(scst2, 2)
 # Test 
 test_agent(2, CR7, num_test)
 
-create_animations_for_level(2)
-
 ############################################
 # Level 3 Training: 2 Forward vs Defender (and GK)
 ############################################
@@ -224,8 +217,6 @@ convert_to_csv(scst3, 3)
 # Test 
 test_agent(3, CR7, num_test)
 
-create_animations_for_level(3)
-
 ############################################
 # Level 4 Training: 3 Forward vs 2 Defender (and GK)
 ############################################
@@ -239,8 +230,6 @@ convert_to_csv(scst4, 4)
 
 # Test 
 test_agent(4, CR7, num_test)
-
-create_animations_for_level(4)
 
 ############################################
 # Level 5 Training: 7vs7
@@ -329,7 +318,6 @@ for episode in range(num_test):
 test_env5.close()
 df2 = pd.DataFrame(diff_goal, columns=['Difference Goal'])
 df2.to_csv(f'DQN/level5_test_diff_goal.csv', index=False)
-create_animations_for_level(5)
 print("Testing on level 5 completed")
 end_time = time.time()
 print(f"Time: {end_time - start_time} seconds")
