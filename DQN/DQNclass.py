@@ -59,7 +59,7 @@ class ExplorationMethod:
         self.steps = 0
 
     def get_epsilon(self):
-        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+        self.epsilon = max(self.epsilon - self.epsilon_decay, self.epsilon_min)
         return self.epsilon
 
     def update_steps(self, steps):

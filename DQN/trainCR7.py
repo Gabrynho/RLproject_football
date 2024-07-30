@@ -32,10 +32,10 @@ gamma = 0.99                # discount factor
 batch_size = 64             # batch size
 
 epsilon = 1.0               # starting value of epsilon
-epsilon_decay = 0.9995      # decay rate of epsilon
-epsilon_min = 0.01          # minimum value of epsilon
+epsilon_decay = 0.00005      # decay rate of epsilon
+epsilon_min = 0.1          # minimum value of epsilon
 
-max_size = 50000            # max size of the replay buffer
+max_size = 10000            # max size of the replay buffer
 
 fc1_dims=128                # number of neurons in the first layer
 fc2_dims=128                # number of neurons in the second layer      
@@ -105,6 +105,7 @@ def train_agent(level, agent, num_episodes):
             agent.save_model('DQN/CR7_model.pth')
     env.close()
     agent.save_model('DQN/CR7_model.pth')
+    agent.exploration.epsilon.reset()
 
     end_time = time.time()
     computation_time = end_time - start_time
