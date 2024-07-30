@@ -218,7 +218,7 @@ create_animations_for_level(4)
 
 # Number of episodes
 num_match = 100
-num_test = 0 
+num_test = 10 
 
 # Initialize the environment
 level5_env = football_env.create_environment(env_name="gm_level5", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
@@ -299,6 +299,7 @@ for episode in range(num_test):
 test_env5.close()
 df2 = pd.DataFrame(diff_goal, columns=['Difference Goal'])
 df2.to_csv(f'DQN/level5_test_diff_goal.csv', index=False)
+create_animations_for_level(5)
 print("Testing on level 5 completed")
 end_time = time.time()
 print(f"Time: {end_time - start_time} seconds")
