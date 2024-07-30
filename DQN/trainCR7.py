@@ -29,10 +29,10 @@ def convert_to_csv(scst, level):
 
 lr = .0001                  # learning rate
 gamma = 0.99                # discount factor
-batch_size = 64             # batch size
+batch_size = 256             # batch size
 
 epsilon = 1.0               # starting value of epsilon
-epsilon_decay = 0.0005     # decay rate of epsilon
+epsilon_decay = 0.005     # decay rate of epsilon
 epsilon_min = 0.1           # minimum value of epsilon
 
 max_size = 10000            # max size of the replay buffer
@@ -67,7 +67,7 @@ if os.path.exists('DQN/CR7_model.pth'):
     CR7.q_eval.to(CR7.q_eval.device)
 
 # Number of episodes
-num_episodes = 10000
+num_episodes = 5000
 num_test = 100
 
 def train_agent(level, agent, num_episodes):
