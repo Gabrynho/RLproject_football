@@ -1,7 +1,7 @@
 # If you are using a linux distribution
 # you can use this script to install the necessary dependencies to run the project.
 # Check the gfootball/doc/compile_engine.md file for more information.
-# after you clone it:
+# after you clone it and stay inside of it!
 # git clone https://github.com/Gabrynho/RLproject_football.git
 
 sudo apt-get update
@@ -28,4 +28,4 @@ conda install libgcc==5.2.0 -y
 conda install -c conda-forge gcc=12.1.0 -y
 
 
-cd RLproject_football && python3 -m pip install .
+python3 -m pip install .

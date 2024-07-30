@@ -1,4 +1,5 @@
 import DQNclass as DQN
+from episode_observations.create_animation import create_animations_for_level
 import torch as th
 import pandas as pd
 import os
@@ -26,15 +27,15 @@ def convert_to_csv(scst, level):
 # Hyperparameters
 ############################################
 
-lr = .00001                 # learning rate
+lr = .0001                  # learning rate
 gamma = 0.99                # discount factor
-batch_size = 128            # batch size
+batch_size = 64             # batch size
 
-epsilon = 0.6              # starting value of epsilon
+epsilon = 1.0               # starting value of epsilon
 epsilon_decay = 0.9995      # decay rate of epsilon
-epsilon_min = 0.01           # minimum value of epsilon
+epsilon_min = 0.01          # minimum value of epsilon
 
-max_size = 10000            # max size of the replay buffer
+max_size = 50000            # max size of the replay buffer
 
 fc1_dims=128                # number of neurons in the first layer
 fc2_dims=128                # number of neurons in the second layer      
@@ -161,6 +162,8 @@ convert_to_csv(scst1, 1)
 # Test 
 test_agent(1, CR7, num_test)
 
+create_animations_for_level(1)
+
 ############################################
 # Level 2 Training: Forward vs Defender (and GK)
 ############################################
@@ -174,6 +177,8 @@ convert_to_csv(scst2, 2)
 
 # Test 
 test_agent(2, CR7, num_test)
+
+create_animations_for_level(2)
 
 ############################################
 # Level 3 Training: 2 Forward vs Defender (and GK)
@@ -189,6 +194,8 @@ convert_to_csv(scst3, 3)
 # Test 
 test_agent(3, CR7, num_test)
 
+create_animations_for_level(3)
+
 ############################################
 # Level 4 Training: 3 Forward vs 2 Defender (and GK)
 ############################################
@@ -202,6 +209,8 @@ convert_to_csv(scst4, 4)
 
 # Test 
 test_agent(4, CR7, num_test)
+
+create_animations_for_level(4)
 
 ############################################
 # Level 5 Training: 7vs7
@@ -247,6 +256,8 @@ for i in range(num_match): # number of episodes
 level5_env.close()
 CR7.save_model('DQN/CR7_model.pth')
 end_time = time.time()
+df1 = pd.DataFrame(diff_goal, columns=['Difference Goal'])
+df1.to_csv(f'DQN/level5_diff_goal.csv', index=False)
 print("Training on level 5 completed")
 print(f"Time: {end_time - start_time} seconds")
 
@@ -258,11 +269,13 @@ print("############################################")
 print("Testing on level 5")
 start_time = time.time()
 diff_goal = []
+observations = []
 
 # Test loops
 for episode in range(num_test):
     # Reset dell'ambiente e raccolta delle osservazioni
     observation = test_env5.reset()
+    observations.append(observation)
     done = False
     score = 0
     rlagent_goal = 0
@@ -270,6 +283,7 @@ for episode in range(num_test):
     while not done:
         action = CR7.choose_action(observation)
         observation, reward, done, info = test_env5.step(action)
+        observations.append(observation)
         # Update the score
         score += reward
         if reward > 0.995:
@@ -278,8 +292,10 @@ for episode in range(num_test):
         if reward < -0.995:
             computer_goal += 1
             print("Goal for the computer!")
-    print(f"Training Match {i+1} RL Agent - Computer: {rlagent_goal}-{computer_goal}")
+    print(f"Training Match {episode+1} RL Agent - Computer: {rlagent_goal}-{computer_goal}")
     diff_goal.append(rlagent_goal-computer_goal)
+    save_observations_to_csv(folder, f'level5_episode_{episode+1}_observations.csv', observations)
+    observations = []
 test_env5.close()
 df2 = pd.DataFrame(diff_goal, columns=['Difference Goal'])
 df2.to_csv(f'DQN/level5_test_diff_goal.csv', index=False)
