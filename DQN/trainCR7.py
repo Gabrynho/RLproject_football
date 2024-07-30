@@ -67,7 +67,7 @@ if os.path.exists('DQN/CR7_model.pth'):
     CR7.q_eval.to(CR7.q_eval.device)
 
 # Number of episodes
-num_episodes = 5000
+num_episodes = 2000
 num_test = 100
 
 def train_agent(level, agent, num_episodes):
@@ -147,6 +147,21 @@ def test_agent(level, agent, num_test):
     end_time = time.time()
     print(f"Testing on level {level} completed")
     print(f"Time: {end_time - start_time} seconds")
+
+############################################
+# Level 0 Training: Forward vs Empty Goal
+############################################
+
+# Train
+scst0 = train_agent(0, CR7, num_episodes)
+
+convert_to_csv(scst0, 0)
+
+############################################
+
+# Test
+
+test_agent(0, CR7, num_test)
 
 ############################################
 # Level 1 Training: Forward vs Goalkeeper

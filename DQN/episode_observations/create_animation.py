@@ -7,7 +7,16 @@ import re
 
 def load_and_process_data(filename, level):
     df = pd.read_csv(f'DQN/episode_observations/{filename}')
-    if level == 1:
+
+    if level == 0:
+        data = df[['88', '89', '2', '3', ]]*100
+        data = data.iloc[:-1]
+        data.columns = ['ball_x', 'ball_y', 'cr7_x', 'cr7_y']
+        data['ball_x'] += 100
+        data['ball_y'] += 42
+        data['cr7_x'] += 100
+        data['cr7_y'] += 42
+    elif level == 1:
         data = df[['88', '89', '0', '1', '2', '3', '8', '9']]*100
         data = data.iloc[:-1]
         data.columns = ['ball_x', 'ball_y', 'gk_x', 'gk_y', 'cr7_x', 'cr7_y', 'gk_opp_x', 'gk_opp_y']
@@ -124,7 +133,14 @@ def create_animation(data, filename, level):
     fig, ax = pitch.draw()
 
     # Initialize the scatter plots for each player and the ball
-    if level == 1:
+    if level == 0:
+        ball_scatter = ax.scatter([], [], color='black', edgecolors='black', zorder=12)
+        cr7_scatter = ax.scatter([], [], color='red', edgecolors='black', zorder=12)
+
+        # Set the size of the scatter plots
+        ball_scatter.set_sizes([100])
+        cr7_scatter.set_sizes([150])
+    elif level == 1:
         ball_scatter = ax.scatter([], [], color='black', edgecolors='black', zorder=12)
         cr7_scatter = ax.scatter([], [], color='red', edgecolors='black', zorder=12)
         gk_opp_scatter = ax.scatter([], [], color='green', edgecolors='black', zorder=12)
@@ -133,8 +149,7 @@ def create_animation(data, filename, level):
         ball_scatter.set_sizes([100])
         cr7_scatter.set_sizes([150])
         gk_opp_scatter.set_sizes([150])
-
-    if level == 2:
+    elif level == 2:
         ball_scatter = ax.scatter([], [], color='black', edgecolors='black', zorder=12)
         cr7_scatter = ax.scatter([], [], color='red', edgecolors='black', zorder=12)
         gk_opp_scatter = ax.scatter([], [], color='green', edgecolors='black', zorder=12)
@@ -145,8 +160,7 @@ def create_animation(data, filename, level):
         cr7_scatter.set_sizes([150])
         gk_opp_scatter.set_sizes([150])
         defender_scatter.set_sizes([150])
-    
-    if level == 3:
+    elif level == 3:
         ball_scatter = ax.scatter([], [], color='black', edgecolors='black', zorder=12)
         cr7_scatter = ax.scatter([], [], color='red', edgecolors='black', zorder=12)
         gk_opp_scatter = ax.scatter([], [], color='green', edgecolors='black', zorder=12)
@@ -159,8 +173,7 @@ def create_animation(data, filename, level):
         gk_opp_scatter.set_sizes([150])
         defender_scatter.set_sizes([150])
         att_scatter.set_sizes([150])
-
-    if level == 4:
+    elif level == 4:
         ball_scatter = ax.scatter([], [], color='black', edgecolors='black', zorder=12)
         cr7_scatter = ax.scatter([], [], color='red', edgecolors='black', zorder=12)
         gk_opp_scatter = ax.scatter([], [], color='green', edgecolors='black', zorder=12)
@@ -214,6 +227,11 @@ def create_animation(data, filename, level):
 
     # Update function for the animation
     def update(frame, level):
+
+        if level == 0:
+            # Update the positions of each player and the ball
+            ball_scatter.set_offsets([data['ball_x'][frame], data['ball_y'][frame]])
+            cr7_scatter.set_offsets([data['cr7_x'][frame], data['cr7_y'][frame]])
 
         if level == 1:
             # Update the positions of each player and the ball
