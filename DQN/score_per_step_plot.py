@@ -16,7 +16,7 @@ for file_name in file_names:
 df1 = pd.read_csv('DQN/level5_diff_goal.csv')
 data.append(df1['Difference Goal'])
 
-fig, axs = plt.subplots(2, 3, figsize=(12, 8))
+fig, axs = plt.subplots(3, 2, figsize=(14, 8))
 axs = axs.flatten()
 
 for i, d in enumerate(data):
