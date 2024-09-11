@@ -3,7 +3,6 @@ import torch as th
 import pandas as pd
 import os
 import time
-import pickle
 import gfootball.env as football_env
 
 ############################################
@@ -32,7 +31,7 @@ gamma = 0.99                # discount factor
 batch_size = 256             # batch size
 
 epsilon = 1.0               # starting value of epsilon
-epsilon_decay = 0.005     # decay rate of epsilon
+epsilon_decay = 0.0000005     # decay rate of epsilon
 epsilon_min = 0.1           # minimum value of epsilon
 
 max_size = 10000            # max size of the replay buffer
@@ -57,7 +56,7 @@ CR7 = DQN.Agent(input_dims=env.observation_space.shape, n_actions=env.action_spa
                   max_size=max_size, 
                   fc1_dims=fc1_dims, fc2_dims=fc2_dims, fc3_dims=fc3_dims)
 
-# Check if the agent has been initialized with cuda
+# Check if the agent has been initialized with cuda or mps
 print(CR7.q_eval.device)
 
 # Load the template if it exists
@@ -70,20 +69,12 @@ if os.path.exists('DQN/CR7_model.pth'):
 num_episodes = 1000
 num_test = 100
 
-def train_agent(level, agent, num_episodes):
-    # The file with checkpointing data
-    chkpt_fname = 'DQN/CR7_checkpoint.pth'
-
+def train_agent(level, agent, num_episodes):    
     print("############################################")
     print(f"Training on level {level}")
     scst = []
 
     env = football_env.create_environment(env_name=f"gm_level{level}", representation='simple115', stacked=False, render=False, rewards='scoring,checkpoints')
-
-    # Check if a checkpoint exists and load it
-    if os.path.exists(chkpt_fname):
-        with open(chkpt_fname, 'rb') as f:
-            agent = pickle.load(f)
 
     # Training loops
     start_time = time.time()
@@ -110,10 +101,6 @@ def train_agent(level, agent, num_episodes):
         print(f'Level {level} Episode {i+1}: Score = {score}, Steps = {steps}')
         if i % 10 == 0:
             agent.save_model('DQN/CR7_model.pth')
-
-        # Save a checkpoint after each episode
-        with open(chkpt_fname, 'wb') as f:
-            pickle.dump(agent, f)
 
     env.close()
     agent.save_model('DQN/CR7_model.pth')

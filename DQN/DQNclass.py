@@ -20,8 +20,15 @@ class DeepQNetwork(nn.Module):
                         )
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
+
         self.loss = nn.MSELoss()
-        self.device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
+
+        if th.cuda.is_available():
+            self.device = th.device('cuda:0')
+        elif th.mps.is_available():
+            self.device = th.device('mps')
+        else:
+            self.device = th.device('cpu')
         self.to(self.device)
 
     def forward(self, state):
@@ -32,7 +39,13 @@ class ReplayBuffer:
     def __init__(self, max_size):
         self.buffer = []
         self.max_size = max_size
-        self.device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
+        if th.cuda.is_available():
+                self.device = th.device('cuda:0')
+        elif th.mps.is_available():
+            self.device = th.device('mps')
+        else:
+            self.device = th.device('cpu')
+        self.to(self.device)
 
     def add(self, state, action, reward, next_state, done):
         self.buffer.append((state, action, reward, next_state, done))
