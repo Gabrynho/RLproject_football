@@ -9,7 +9,7 @@ def load_and_process_data(filename):
     df = pd.read_csv(f'DQN/episode_observations/{filename}')
     data = df[['88', '89', '0', '1', '2', '3', '4', '5', '6', '7', '16', '17', '18', '19', '20', '21']]*100
     data = data.iloc[:-1]
-    data.columns = ['ball_x', 'ball_y', 'gk_x', 'gk_y', 'att1_x', 'att1_y', 'cr7_x', 'cr7_y', 'att2_x', 'att_y', 'gk_opp_x', 'gk_opp_y','defender1_x','defender1_y', 'defender2_x', 'defender2_y']
+    data.columns = ['ball_x', 'ball_y', 'gk_x', 'gk_y', 'att1_x', 'att1_y', 'cr7_x', 'cr7_y', 'att2_x', 'att2_y', 'gk_opp_x', 'gk_opp_y','defender1_x','defender1_y', 'defender2_x', 'defender2_y']
     data['ball_x'] += 100
     data['ball_y'] += 42
     data['gk_x'] += 100
@@ -25,7 +25,7 @@ def load_and_process_data(filename):
     data['defender2_x'] += 100
     data['defender2_y'] += 42
     data['att2_x'] += 100
-    data['att_y'] += 42
+    data['att2_y'] += 42
     return data
 
 def create_animation(data, filename):
@@ -65,7 +65,7 @@ def create_animation(data, filename):
         defender1_scatter.set_offsets([data['defender1_x'][frame], data['defender1_y'][frame]])
         defender2_scatter.set_offsets([data['defender2_x'][frame], data['defender2_y'][frame]])
         att1_scatter.set_offsets([data['att1_x'][frame], data['att1_y'][frame]])
-        att2_scatter.set_offsets([data['att1_x'][frame], data['att1_y'][frame]])
+        att2_scatter.set_offsets([data['att2_x'][frame], data['att2_y'][frame]])
 
     # Create the animation
     ani = animation.FuncAnimation(fig, update, frames=len(data), interval=100)

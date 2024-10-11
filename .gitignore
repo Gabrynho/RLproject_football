@@ -34,3 +34,7 @@ cmake_install.cmake
 
 # TEMPPO folder and its contents
 TEMPPO/
+
+# csv files and mp4 files
+DQN/episode_observations_DL/*.csv
+DQN/episode_observations_DL/*.mp4

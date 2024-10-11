@@ -2,62 +2,99 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# List of file names
-file_names = ['DQN/level0_score_per_step.csv','DQN/level1_score_per_step.csv', 'DQN/level2_score_per_step.csv', 'DQN/level3_score_per_step.csv', 'DQN/level4_score_per_step.csv']
+WINDOW_SIZE = 50
 
-# Initialize an empty list to store the data
-data = []
+# List of levels
+levels = [0, 1, 2, 3, 4]
 
-# Read the data from each file and append it to the list
-for file_name in file_names:
-    df = pd.read_csv(file_name)
-    data.append(df['Score per Step'])
+# Initialize lists to store the data
+score_per_step_data = []
+total_reward_data = []
 
-df1 = pd.read_csv('DQN/level5_diff_goal.csv')
-data.append(df1['Difference Goal'])
+# Read Score per Step and Total Reward data for levels 0 to 4
+for level in levels:
+    # Read Score per Step data
+    score_per_step_file = f'DQN/level{level}_score_per_step_DL.csv'
+    df_sps = pd.read_csv(score_per_step_file)
+    score_per_step_data.append(df_sps['Score per Step'])
 
-fig, axs = plt.subplots(3, 2, figsize=(14, 8))
-axs = axs.flatten()
+    # Read Total Reward data
+    total_reward_file = f'DQN/level{level}_total_rewards_DL.csv'
+    df_tr = pd.read_csv(total_reward_file)
+    total_reward_data.append(df_tr['Total Reward'])
 
-for i, d in enumerate(data):
-    if i == 5:
-        axs[i].plot(d, label='Difference Goal')
-        axs[i].set_xlabel('Episode')
-        axs[i].set_ylabel('Difference Goal')
-        axs[i].set_title('Difference Goal vs Episode (Level 5)')
-        axs[i].legend()
-    else:
-        axs[i].plot(d, label=f'Level {i}')
-        axs[i].set_xlabel('Episode')
-        axs[i].set_ylabel('Score per Step')
-        axs[i].set_title(f'Score per Step vs Episode (Level {i})')
-        axs[i].legend()
+# Read Difference Goal data for level 5
+# df_dg = pd.read_csv('DQN/level5_diff_goal.csv')
+# difference_goal_data = df_dg['Difference Goal']
 
+# Create a figure for Score per Step
+fig_sps, axs_sps = plt.subplots(3, 2, figsize=(14, 10))
+axs_sps = axs_sps.flatten()
+
+# Plot Score per Step for levels 0 to 4
+for i, d in enumerate(score_per_step_data):
     x = np.arange(len(d))
     y = d
+    axs_sps[i].plot(x, y, label=f'Level {i} Score per Step')
+    axs_sps[i].set_xlabel('Episode')
+    axs_sps[i].set_ylabel('Score per Step')
+    axs_sps[i].set_title(f'Level {i} Score per Step vs Episode')
+    axs_sps[i].legend()
 
-    best_degree = None
-    min_chi2 = float('inf')
+    # Calculate and plot moving average
+    
+    if len(y) >= WINDOW_SIZE:
+        moving_avg = np.convolve(y, np.ones(WINDOW_SIZE)/WINDOW_SIZE, mode='valid')
+        axs_sps[i].plot(x[WINDOW_SIZE-1:], moving_avg, color='red', linestyle='--', label='Moving Average')
+        axs_sps[i].legend()
 
-    # Test del chi-quadro per selezionare il miglior grado del polinomio
-    for degree in range(2, 16):
-        coeffs = np.polyfit(x, y, degree)
-        poly_eq = np.poly1d(coeffs)
-        fitted_values = poly_eq(x)
-        chi2_value = np.sum(((y - fitted_values) ** 2) / fitted_values)
+# Plot Difference Goal for level 5
+# x_dg = np.arange(len(difference_goal_data))
+# y_dg = difference_goal_data
+# axs_sps[5].plot(x_dg, y_dg, label='Level 5 Difference Goal')
+# axs_sps[5].set_xlabel('Episode')
+# axs_sps[5].set_ylabel('Difference Goal')
+# axs_sps[5].set_title('Level 5 Difference Goal vs Episode')
+# axs_sps[5].legend()
 
-        if chi2_value < min_chi2:
-            min_chi2 = chi2_value
-            best_coeffs = coeffs
+# # Calculate and plot moving average for Difference Goal
+# WINDOW_SIZE_dg = 5
+# if len(y_dg) >= WINDOW_SIZE_dg:
+#     moving_avg_dg = np.convolve(y_dg, np.ones(WINDOW_SIZE_dg)/WINDOW_SIZE_dg, mode='valid')
+#     axs_sps[5].plot(x_dg[WINDOW_SIZE_dg-1:], moving_avg_dg, color='red', linestyle='--', label='Moving Average')
+#     axs_sps[5].legend()
 
-    poly_eq = np.poly1d(best_coeffs)
-    axs[i].plot(x, poly_eq(x), color='red', linestyle='--')
-    degree = len(best_coeffs) - 1
-    coeffs_str = f'Grade {degree}'
-    axs[i].legend(['Agent during Training', f'Fit: Degree {degree}, $\\chi^2$ = {min_chi2:.2f}'])
+# plt.tight_layout()
+# plt.show()
 
-#plt.tight_layout()
+# Create a figure for Total Reward
+fig_tr, axs_tr = plt.subplots(3, 2, figsize=(14, 10))
+axs_tr = axs_tr.flatten()
+
+# Plot Total Reward for levels 0 to 4
+for i, d in enumerate(total_reward_data):
+    x = np.arange(len(d))
+    y = d
+    axs_tr[i].plot(x, y, label=f'Level {i} Total Reward')
+    axs_tr[i].set_xlabel('Episode')
+    axs_tr[i].set_ylabel('Total Reward')
+    axs_tr[i].set_title(f'Level {i} Total Reward vs Episode')
+    # axs_tr[i].set_yscale('log')
+    axs_tr[i].legend()
+
+    # Calculate and plot moving average
+    
+    if len(y) >= WINDOW_SIZE:
+        moving_avg = np.convolve(y, np.ones(WINDOW_SIZE)/WINDOW_SIZE, mode='valid')
+        axs_tr[i].plot(x[WINDOW_SIZE-1:], moving_avg, color='red', linestyle='--', label='Moving Average')
+        axs_tr[i].legend()
+
+# Remove the unused subplot (since we have only 5 plots)
+fig_tr.delaxes(axs_tr[5])
+
+plt.tight_layout()
 plt.show()
 
-# Save the plot
-#plt.savefig('DQN/score_per_step_plot.png')
+# Optionally, save the plots
+# fig_sps.savefig('DQN/score_per_step_plot.png')
+# fig_tr.savefig('DQN/total_reward_plot.png')
